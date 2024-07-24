@@ -1,0 +1,12 @@
+{
+    "name": "proxyz-server",
+    "version": "1.0.0",
+    "main": "proxyz-server.js",
+    "scripts": {
+        "start": "node proxyz-server.js"
+    },
+    "dependencies": {
+        "axios": "^0.21.4",
+        "express": "^4.19.2"
+    }
+}
