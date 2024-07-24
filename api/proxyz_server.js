@@ -9,7 +9,14 @@ app.get('/api/proxy-image', (req, res) => {
         return res.status(400).send('Image URL is required');
     }
     console.log(imageUrl)
-    request(imageUrl).pipe(res);
+    // 在请求头中添加 User-Agent
+    const options = {
+        url: imageUrl,
+        headers: {
+            'User-Agent': 'atoposyz/proxyz'
+        }
+    };
+    request(options).pipe(res);
 });
 
 module.exports = app;
