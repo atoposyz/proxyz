@@ -1,27 +1,15 @@
 const express = require('express');
-const axios = require('axios');
+const request = require('request');
 const app = express();
 
-app.get('/proxy', async function(req, res) {
-    const imageUrl = req.query.url;
-
+app.get('/proxy-image', (req, res) => {
+    const imageUrl = req.query.url;  // 从查询参数中获取图片URL
     if (!imageUrl) {
-        return res.status(400).send('URL parameter is required');
+        return res.status(400).send('Image URL is required');
     }
-
-    try {
-        const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-
-        res.set({
-            'Content-Type': response.headers['content-type'],
-            'Content-Length': response.headers['content-length']
-        });
-        res.send(response.data);
-    } catch (error) {
-        res.status(500).send('Error fetching the image');
-    }
+    request(imageUrl).pipe(res);
 });
 
 app.listen(3000, () => {
-    console.log('Proxy server is running on port 3000');
+    console.log('Proxy server listening on port 3000');
 });
