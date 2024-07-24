@@ -1,6 +1,13 @@
 const express = require('express');
 const request = require('request');
+const cors = require('cors');
 const app = express();
+
+// 使用 CORS 中间件
+app.use(cors({
+    origin: 'https://atoposyz.github.io', // 替换为你的实际域名
+    methods: ['GET'],
+}));
 
 app.get('/api/proxy-image', (req, res) => {
     console.log(req)
