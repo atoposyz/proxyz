@@ -10,20 +10,34 @@ app.use(cors({
 }));
 
 app.get('/api/proxy-image', (req, res) => {
-    console.log(req)
-    const imageUrl = req.query.url;  // 从查询参数中获取图片URL
-    if (!imageUrl) {
-        return res.status(400).send('Image URL is required');
-    }
-    console.log(imageUrl)
-    // 在请求头中添加 User-Agent
-    const options = {
-        url: imageUrl,
-        headers: {
-            'User-Agent': 'atoposyz/proxyz'
-        }
-    };
-    request(options).pipe(res);
+  const imageUrl = req.query.url;
+  if (!imageUrl) return res.status(400).send('Image URL is required');
+
+  const targetUrl = decodeURIComponent(imageUrl);
+
+  // 禁止任何缓存（浏览器 / CDN / Vercel）
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
+  const options = {
+    url: targetUrl,
+    headers: { 'User-Agent': 'atoposyz/proxyz' },
+  };
+
+  request(options)
+    .on('response', (r) => {
+      // 转发 content-type，html-to-image 更稳定
+      if (r.headers['content-type']) {
+        res.setHeader('Content-Type', r.headers['content-type']);
+      }
+    })
+    .on('error', (err) => {
+      console.error(err);
+      res.status(502).send('Upstream fetch failed');
+    })
+    .pipe(res);
 });
+
 
 module.exports = app;
